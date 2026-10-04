@@ -1,24 +1,24 @@
 # WhatsApp Birthday Bot — macOS
 
-Bot local en Python pour souhaiter les anniversaires dans un groupe **WhatsApp Desktop sur macOS**. Les personnes sont décrites dans un fichier JSON privé; les réglages communs sont centralisés dans `.env`. Le planificateur natif `launchd` lance les vérifications, et l’accessibilité macOS permet de piloter WhatsApp.
+A local Python bot that sends birthday wishes to a **WhatsApp Desktop group on macOS**. People and their birthdays are stored in a private JSON file, while shared settings live in `.env`. The native `launchd` scheduler runs the checks, and macOS Accessibility controls WhatsApp.
 
-Le projet utilise l’interface de WhatsApp, sans API WhatsApp Business ni service hébergé. Le mode par défaut simule les anniversaires dus. Les envois réels nécessitent une commande explicite.
+The project automates the WhatsApp interface without using the WhatsApp Business API or a hosted service. By default, it previews birthdays that are due. Sending real messages requires an explicit command.
 
-## Compatibilité et limites
+## Compatibility and limitations
 
-- **macOS uniquement** pour le pilotage et la planification : MacBook, iMac, Mac mini ou autre Mac. Windows, Linux et les appareils mobiles ne sont pas pris en charge.
-- **Python 3.12 recommandé**; les dépendances PyObjC épinglées demandent Python 3.10 ou plus.
-- Configuration testée : Mac Apple Silicon, macOS 26, Python 3.12 et WhatsApp Desktop **2.26.37.22**. Les autres versions de WhatsApp et les Mac Intel n’ont pas été validés par les essais de ce projet. Voir la [compatibilité de PyObjC](https://pyobjc.readthedocs.io/en/latest/supported-platforms.html).
-- WhatsApp Desktop doit être installé, connecté au compte voulu, et accessible dans une **session ouverte et déverrouillée**, avec une connexion réseau pour l’envoi.
-- Le bot peut ouvrir WhatsApp et le mettre au premier plan. Éviter de manipuler WhatsApp pendant un envoi. Un brouillon existant provoque un arrêt pour le préserver.
-- Les noms de groupe doivent correspondre exactement et ne pas être ambigus. Les menus reconnus sont en français ou en anglais.
-- Une mise à jour de WhatsApp peut modifier les sélecteurs d’accessibilité. Le bot s’arrête si les contrôles attendus sont absents ou ambigus.
-- Le bot ne fonctionne pas pendant que le Mac est éteint. Il rattrape les anniversaires dus **le même jour**, après l’heure prévue. Aucun envoi tardif n’est effectué le lendemain. Il ne réveille pas le Mac et ne déverrouille pas la session.
-- Le statut « envoyé » reflète ce que WhatsApp expose; il ne garantit pas que tous les destinataires ont reçu ou lu le message.
+- **macOS only** for sending and scheduling: MacBook, iMac, Mac mini, or another Mac. Windows, Linux, and mobile devices are not supported.
+- **Python 3.12 recommended**; the pinned PyObjC dependencies require Python 3.10 or later.
+- Tested configuration: Apple Silicon Mac, macOS 26, Python 3.12, and WhatsApp Desktop **2.26.37.22**. Other WhatsApp versions and Intel Macs have not been validated by this project's tests. See [PyObjC platform support](https://pyobjc.readthedocs.io/en/latest/supported-platforms.html).
+- WhatsApp Desktop must be installed, signed in to the intended account, and accessible in an **active, unlocked macOS session**, with a network connection for sending.
+- The bot may open WhatsApp and bring it to the foreground. Avoid interacting with WhatsApp during a send. If a draft already exists, the bot stops to preserve it.
+- Group names must match exactly and identify a single conversation. French and English menu names are supported.
+- A WhatsApp update may change Accessibility selectors. The bot stops if expected controls are missing or ambiguous.
+- The bot cannot run while the Mac is powered off. It catches up on birthdays **on the same day**, after the configured sending time. It does not send overdue wishes the following day, wake the Mac, or unlock the session.
+- The “sent” status reflects what WhatsApp exposes; it does not guarantee that every recipient has received or read the message.
 
 ## Installation
 
-Installer [Python 3.12](https://www.python.org/downloads/) et WhatsApp Desktop, puis exécuter :
+Install [Python 3.12](https://www.python.org/downloads/) and WhatsApp Desktop, then run:
 
 ```sh
 git clone https://github.com/Wolfidy7/whatsapp-birthday-bot-macos.git
@@ -33,67 +33,67 @@ cp birthdays.json.example birthdays.json
 chmod 600 .env birthdays.json
 ```
 
-Les commandes suivantes supposent que le `.venv` est activé. Sinon, remplacer `python` par `.venv/bin/python`. Les fichiers d’exemple contiennent uniquement des données fictives. Adapter `.env` et `birthdays.json` avant d’activer des envois réels.
+The commands below assume the `.venv` is activated. Otherwise, replace `python` with `.venv/bin/python`. The example files contain fictional data only. Customize `.env` and `birthdays.json` before enabling real sends.
 
-## Autorisations macOS
+## macOS permissions
 
-L’autorisation nécessaire est **Accessibilité**, qui permet de lire les contrôles de WhatsApp, d’activer ses menus et, si nécessaire, de cliquer dans ses champs. L’implémentation n’utilise pas de capture d’écran ni de scripts AppleScript : elle ne demande pas les droits Enregistrement de l’écran, Automatisation ou Accès complet au disque.
+The required permission is **Accessibility**. It allows the bot to read WhatsApp controls, activate menus, and click fields when needed. This implementation does not capture screenshots or use AppleScript: it does not request Screen Recording, Automation, or Full Disk Access permissions.
 
-### Commandes manuelles
+### Manual commands
 
-1. Lancer `python permissions.py` depuis le terminal utilisé pour le bot.
-2. Ouvrir **Réglages système → Confidentialité et sécurité → Accessibilité**.
-3. Ajouter avec **+** le terminal utilisé, par exemple Terminal ou iTerm, ou l’application hébergeant le terminal intégré. Activer son interrupteur. Selon le contexte de lancement, macOS peut identifier Python comme processus à autoriser.
-4. Relancer la commande si macOS demande de rouvrir l’application, puis vérifier :
+1. Run `python permissions.py` from the terminal you will use for the bot.
+2. Open **System Settings → Privacy & Security → Accessibility**.
+3. Use **+** to add your terminal, such as Terminal or iTerm, or the application hosting an integrated terminal. Enable its switch. Depending on how the bot is launched, macOS may identify Python as the process that needs permission.
+4. Restart the application if macOS asks you to, then check:
 
 ```sh
 python main.py --doctor
 ```
 
-Le diagnostic vérifie l’accessibilité, la session déverrouillée et la fenêtre WhatsApp. Il n’envoie aucun message. Voir les [réglages de confidentialité et sécurité chez Apple](https://support.apple.com/en-gb/guide/mac-help/mchl211c911f/27/mac/27).
+The diagnostic checks Accessibility access, the unlocked session, and the WhatsApp window. It does not send a message. See [Apple's Privacy & Security settings guide](https://support.apple.com/en-gb/guide/mac-help/mchl211c911f/27/mac/27).
 
-### Envois en arrière-plan avec launchd
+### Background sends with launchd
 
-L’autorisation du terminal ne couvre pas nécessairement le Python lancé par `launchd`. Vérifier ce contexte séparément :
+Permission granted to the terminal does not necessarily cover Python when `launchd` starts it. Check that context separately:
 
 ```sh
 python scheduler.py --check-permissions
 ```
 
-En cas de refus, cette commande indique **le chemin réel de l’exécutable Python** à ajouter dans la même liste Accessibilité. Pour afficher ce chemin soi-même :
+If access is denied, this command prints **the actual Python executable path** to add to the same Accessibility list. You can also display that path yourself:
 
 ```sh
 python -c 'import sys; from pathlib import Path; print(Path(sys.executable).resolve())'
 ```
 
-Cliquer sur **+**, puis utiliser **Cmd+Maj+G** pour accéder au chemin affiché. Si le sélecteur masque le fichier Python, sélectionner le fichier dans le Finder et le **glisser-déposer dans la liste Accessibilité**, puis activer son interrupteur. Relancer `--check-permissions` : un résultat `OK` valide la permission dans le contexte de `launchd`.
+Click **+**, then use **Cmd+Shift+G** to navigate to the displayed path. If the file picker hides the Python executable, select it in Finder and **drag it into the Accessibility list**, then enable its switch. Run `--check-permissions` again: an `OK` result confirms permission in the `launchd` context.
 
-Les installations avec envoi réel et les tâches ponctuelles en arrière-plan refusent de s’installer si ce contrôle échoue. En cas de changement d’installation Python, vérifier de nouveau les permissions du nouvel exécutable.
+Real-send scheduler installations and background one-off tasks refuse to install if this check fails. If you change your Python installation, check permissions again for the new executable.
 
 ## Configuration
 
-### Réglages communs : .env
+### Shared settings: .env
 
-Le fichier `.env` est lu directement à chaque vérification. Aucun `source .env` ni export shell n’est nécessaire. Les variables du terminal ne remplacent pas ses valeurs.
+The `.env` file is read directly on each check. You do not need to run `source .env` or export shell variables. Terminal environment variables do not override its values.
 
-| Variable | Rôle |
+| Variable | Purpose |
 | --- | --- |
-| `TIMEZONE` | Fuseau IANA, par exemple `UTC` ou `Europe/Paris`. |
-| `WHATSAPP_GROUP` | Nom exact du groupe cible. |
-| `SEND_TIME` | Heure commune des anniversaires, au format `HH:MM`, dans `TIMEZONE`. |
-| `MESSAGE_HEADER` | En-tête commun, suivi automatiquement de deux sauts de ligne. |
-| `MESSAGE_TEMPLATE` | Message commun avec le seul marqueur `{name}`. |
-| `MAX_MESSAGES_PER_RUN` | Maximum d’anniversaires envoyés par passage, entre 1 et 20. |
-| `SCHEDULER_INTERVAL_SECONDS` | Intervalle de vérification des anniversaires, en secondes. |
-| `ONE_OFF_INTERVAL_SECONDS` | Intervalle de vérification des messages ponctuels, en secondes. |
-| `TEST_MESSAGE` | Message par défaut de `test_send.py`. |
-| `ONE_OFF_MESSAGE` | Message par défaut de `schedule_once.py`. |
+| `TIMEZONE` | IANA timezone, such as `UTC` or `Europe/Paris`. |
+| `WHATSAPP_GROUP` | Exact name of the target group. |
+| `SEND_TIME` | Shared birthday sending time, in `HH:MM` format and the configured `TIMEZONE`. |
+| `MESSAGE_HEADER` | Shared header, automatically followed by two newline characters. |
+| `MESSAGE_TEMPLATE` | Shared message body, with `{name}` as the only supported placeholder. |
+| `MAX_MESSAGES_PER_RUN` | Maximum birthdays sent per run, from 1 to 20. |
+| `SCHEDULER_INTERVAL_SECONDS` | Birthday check interval, in seconds. |
+| `ONE_OFF_INTERVAL_SECONDS` | One-off message check interval, in seconds. |
+| `TEST_MESSAGE` | Default message for `test_send.py`. |
+| `ONE_OFF_MESSAGE` | Default message for `schedule_once.py`. |
 
-Format : une variable `KEY=value` par ligne, ou une chaîne entre **guillemets doubles** avec les échappements JSON (`\n`, `\"`). Les lignes commençant par `#` sont des commentaires. Les commentaires en fin de ligne, les guillemets simples et les substitutions shell ne sont pas interprétés. Toutes les variables du modèle sont requises; les clés inconnues ou dupliquées provoquent un arrêt. Pour une accolade littérale dans le modèle du message, utiliser `{{` ou `}}`.
+Format: one `KEY=value` per line, or a **double-quoted** string using JSON escapes (`\n`, `\"`). Lines beginning with `#` are comments. Inline comments, single quotes, and shell substitutions are not interpreted. Every variable in the example is required; unknown or duplicate keys stop execution. Use `{{` or `}}` for literal braces in the message template.
 
-Les changements de groupe, d’heure, de texte et de limite sont pris en compte au passage suivant. Changer `SCHEDULER_INTERVAL_SECONDS` exige de **désinstaller puis réinstaller** le scheduler, car `launchd` mémorise cet intervalle dans son `.plist`.
+Changes to the group, sending time, message, and limit take effect on the next check. Changing `SCHEDULER_INTERVAL_SECONDS` requires **uninstalling and reinstalling** the scheduler because `launchd` stores that interval in its `.plist`.
 
-### Personnes : birthdays.json
+### People: birthdays.json
 
 ```json
 {
@@ -104,152 +104,152 @@ Les changements de groupe, d’heure, de texte et de limite sont pris en compte 
 }
 ```
 
-Chaque personne possède un identifiant unique, un prénom, un mois et un jour. Aucun âge ni année de naissance n’est nécessaire. Les anniversaires du 29 février sont envoyés uniquement les années bissextiles.
+Each person has a unique ID, a name, a month, and a day. No age or birth year is required. February 29 birthdays are sent only in leap years.
 
-**Garder les identifiants stables** : changer l’`id` d’un anniversaire déjà envoyé peut provoquer un nouvel envoi le même jour. Le groupe, l’heure et le message restent dans `.env`.
+**Keep IDs stable**: changing the `id` of a birthday that has already been sent can cause another send on the same day. The group, time, and message stay in `.env`.
 
-## Simulation et premier test
+## Preview and first test
 
 ```sh
-# Afficher les anniversaires dus sans ouvrir WhatsApp ni enregistrer d’envoi.
+# Preview due birthdays without opening WhatsApp or recording a send.
 python main.py
 
-# Vérifier un groupe dédié, sans écrire de message.
+# Check a dedicated test group without writing a message.
 python test_send.py --group "Test"
 
-# Envoyer réellement TEST_MESSAGE dans ce groupe (une fois par jour).
+# Actually send TEST_MESSAGE to that group (once per day).
 python test_send.py --group "Test" --send
 
-# Envoyer les anniversaires dus aujourd’hui, après SEND_TIME.
+# Send today's due birthdays after SEND_TIME.
 python main.py --send
 
-# Consulter l’historique et les résultats incertains.
+# View history and uncertain results.
 python main.py --history
 ```
 
-« Aucun anniversaire à envoyer » est normal si aucune personne n’est due aujourd’hui. Les tests automatisés injectent des dates fictives : aucun changement de date du Mac n’est nécessaire. Un message de test personnalisé peut être fourni avec `--message`.
+A “no birthdays to send” result is normal when nobody is due today. Automated tests inject fictional dates, so there is no need to change your Mac's date. You can provide a custom test message with `--message`. The command-line output currently uses French messages.
 
-## Planifier les anniversaires
+## Schedule birthdays
 
 ```sh
-# Générer un .plist local pour inspection, sans installer de service.
+# Generate a local .plist for inspection without installing a service.
 python scheduler.py
 
-# Installer une vérification automatique en simulation.
+# Install automatic checks in preview mode.
 python scheduler.py --install
 
-# Après validation des permissions et du premier test, activer les envois réels.
+# After checking permissions and completing the first test, enable real sends.
 python scheduler.py --check-permissions
 python scheduler.py --uninstall
 python scheduler.py --install --send
 
-# Arrêter et retirer le scheduler.
+# Stop and remove the scheduler.
 python scheduler.py --uninstall
 ```
 
-L’agent utilisateur est installé dans `~/Library/LaunchAgents`. Il utilise les chemins absolus du projet et du Python actif. Ne pas déplacer le projet après installation : désinstaller avant le déplacement et réinstaller depuis le nouvel emplacement.
+The user agent is installed in `~/Library/LaunchAgents`. It uses absolute paths to the project and the active Python executable. Do not move the project after installation: uninstall before moving it, then reinstall from the new location.
 
-Le scheduler vérifie les anniversaires dès son chargement, notamment à l’ouverture de session, puis selon `SCHEDULER_INTERVAL_SECONDS`. L’exemple utilise 300 secondes, soit cinq minutes. Les passages ne sont pas alignés sur des heures fixes; un anniversaire prévu à 09:00 peut donc être envoyé quelques minutes après. L’installation avec `--send` peut envoyer immédiatement un anniversaire déjà dû.
+The scheduler checks birthdays when it loads, including at login, and then according to `SCHEDULER_INTERVAL_SECONDS`. The example uses 300 seconds, or five minutes. Checks are not aligned to fixed clock times, so a birthday scheduled for 09:00 may be sent a few minutes later. Installation with `--send` may immediately send a birthday that is already due.
 
-Une installation existante doit être retirée avant remplacement. Pour appliquer un nouvel intervalle dans `.env` :
+Remove an existing installation before replacing it. To apply a new interval from `.env`:
 
 ```sh
 python scheduler.py --uninstall
 python scheduler.py --install --send
 ```
 
-L’historique est conservé par cette opération. Après installation :
+This operation preserves the send history. After installation, inspect the service with:
 
 ```sh
 launchctl print gui/$(id -u)/com.whatsapp-birthday-bot.scheduler
 ```
 
-## Programmer un message ponctuel
+## Schedule a one-off message
 
-Ces commandes programment un **vrai envoi**; elles n’exigent pas `--send` :
+These commands schedule a **real send**; they do not require `--send`:
 
 ```sh
-# Programmer ONE_OFF_MESSAGE dans Test dans deux minutes.
+# Schedule ONE_OFF_MESSAGE in Test in two minutes.
 python schedule_once.py --in-minutes 2 --group "Test"
 
-# Choisir un texte précis.
-python schedule_once.py --in-minutes 2 --group "Test" --message "Rappel de démonstration"
+# Choose a specific message.
+python schedule_once.py --in-minutes 2 --group "Test" --message "Demo reminder"
 
-# Attendre depuis un terminal autorisé, sans service en arrière-plan.
+# Wait in an authorized terminal without a background service.
 python schedule_once.py --in-minutes 2 --group "Test" --foreground
 
-# Annuler la programmation avant l’envoi.
+# Cancel the scheduled message before it sends.
 python schedule_once.py --cancel
 ```
 
-Sans `--group`, le groupe vient de `.env`. WhatsApp s’ouvre immédiatement pour vérifier le groupe; le délai commence **après cette vérification**. À l’échéance, le groupe est recherché à nouveau pour éviter d’envoyer dans une autre conversation.
+Without `--group`, the group comes from `.env`. WhatsApp opens immediately to verify the group; the delay starts **after that check**. At the scheduled time, the bot searches for the group again to avoid sending to a different conversation.
 
-Une seule tâche ponctuelle peut être programmée à la fois. Le texte, le groupe, l’échéance et l’intervalle sont figés à la programmation : annuler puis reprogrammer pour les changer. L’agent n’envoie jamais avant l’heure affichée et se retire après confirmation ou erreur d’envoi. Un message manqué expire à la fin de sa journée locale. `--foreground` exige que le terminal reste ouvert.
+Only one one-off task can be scheduled at a time. Its message, group, due time, and check interval are fixed when it is scheduled: cancel and reschedule to change them. The agent never sends before the displayed time and removes itself after confirmation or a sending error. A missed message expires at the end of its local day. `--foreground` requires the terminal to stay open.
 
-## Doublons et résultats incertains
+## Duplicate prevention and uncertain results
 
-Avant l’action d’envoi, le bot enregistre une réservation dans `state.json`. Après confirmation d’un nouveau message sortant avec le texte attendu et un statut envoyé, distribué ou lu, il enregistre l’envoi confirmé. La comparaison tient compte des marqueurs gras, italiques ou barrés que WhatsApp retire du texte rendu.
+Before the sending action, the bot records a pending reservation in `state.json`. Once a new outgoing message with the expected text and a sent, delivered, or read status is confirmed, it records the confirmed send. Text comparison accounts for bold, italic, and strikethrough markers that WhatsApp removes from the rendered text.
 
-Un résultat incertain reste réservé et n’est **pas renvoyé automatiquement**, même après un redémarrage ou l’année suivante. Un verrou empêche les exécutions simultanées. Les changements d’état sont écrits atomiquement avec des permissions privées.
+An uncertain result keeps its reservation and is **not resent automatically**, even after a restart or in the following year. A lock prevents concurrent executions. State updates are written atomically with private file permissions.
 
-Vérifier le groupe dans WhatsApp avant de résoudre une réservation :
+Check the group in WhatsApp before resolving a reservation:
 
 ```sh
 python main.py --history
 
-# Exemple : le message a effectivement été envoyé.
+# Example: the message was actually sent.
 python main.py --resolve camille-example 2030-05-14 sent
 
-# Seulement après vérification que le message n’a pas été envoyé.
+# Only after checking that the message was not sent.
 python main.py --resolve camille-example 2030-05-14 retry
 ```
 
-Adapter l’identifiant et la date à l’entrée réellement réservée. `retry` permet un nouvel essai si l’anniversaire est encore dû aujourd’hui. Ne pas effacer l’historique pour débloquer le bot : cela supprime la protection contre les doublons. Un échec avant envoi peut laisser le texte comme brouillon; le vérifier avant une nouvelle tentative.
+Use the ID and date of the actual pending entry. `retry` allows another attempt if the birthday is still due today. Do not erase the history to unblock the bot: this removes duplicate protection. A failure before sending may leave the text as a draft; check it before another attempt.
 
-## Architecture et outils
+## Architecture and tools
 
 ```mermaid
 flowchart TD
-    L[launchd ou commande manuelle] --> M[Commande Python]
-    M --> C[Lecture .env et birthdays.json]
-    C --> D[Anniversaires dus et historique]
-    D --> S{Envoi réel demandé ?}
-    S -->|Non| P[Simulation dans le terminal]
-    S -->|Oui| V[Vérification du groupe et du brouillon]
-    V --> R[Réservation durable dans state.json]
-    R --> A[Envoi par accessibilité macOS]
-    A --> F{Confirmation WhatsApp}
-    F -->|Confirmé| H[Envoi enregistré]
-    F -->|Incertain| B[Réservation conservée]
+    L[launchd or manual command] --> M[Python command]
+    M --> C[Read .env and birthdays.json]
+    C --> D[Due birthdays and send history]
+    D --> S{Real send requested?}
+    S -->|No| P[Preview in terminal]
+    S -->|Yes| V[Check group and existing draft]
+    V --> R[Persist reservation in state.json]
+    R --> A[Send through macOS Accessibility]
+    A --> F{WhatsApp confirmation}
+    F -->|Confirmed| H[Record confirmed send]
+    F -->|Uncertain| B[Keep pending reservation]
 ```
 
-Le calendrier et l’état durable utilisent la bibliothèque standard Python : `zoneinfo` pour les fuseaux, JSON pour les données, `fcntl` pour les verrous et un fichier temporaire remplacé atomiquement pour les écritures. L’adaptateur macOS utilise **PyObjC** : Cocoa pour les applications et le presse-papiers, ApplicationServices pour l’arbre d’accessibilité, Quartz pour les clics et l’état de session. **launchd** lance les tâches utilisateur sans serveur supplémentaire.
+The calendar and durable state use the Python standard library: `zoneinfo` for timezones, JSON for data, `fcntl` for locks, and an atomically replaced temporary file for writes. The macOS adapter uses **PyObjC**: Cocoa for applications and the clipboard, ApplicationServices for the Accessibility tree, and Quartz for clicks and session state. **launchd** runs user tasks without an additional server.
 
-Le collage passe par le menu Édition, compatible avec les dispositions AZERTY et QWERTY. Le presse-papiers est restauré sauf s’il a été modifié entre-temps. Les contrôles sont identifiés par leurs sélecteurs et leur position actuelle. Le bot n’écrit pas directement les attributs `AXValue` ou `AXFocused` dans WhatsApp Catalyst, afin d’éviter les blocages observés pendant les essais.
+Pasting uses the Edit menu and works with AZERTY and QWERTY layouts. The clipboard is restored unless it has changed in the meantime. Controls are identified by their selectors and current positions. The bot does not directly set `AXValue` or `AXFocused` attributes in WhatsApp Catalyst, to avoid freezes observed during testing.
 
-| Fichier | Rôle |
+| File | Purpose |
 | --- | --- |
-| `main.py` | Commande principale : simulation, envoi, diagnostic, historique et résolution. |
-| `birthday_bot.py` | Validation, calcul des anniversaires dus, verrou et état durable. |
-| `settings.py` | Lecture et validation des réglages `.env`. |
-| `whatsapp_ax.py` | Recherche du groupe, collage, envoi et confirmation par accessibilité. |
-| `scheduler.py` | Génération, installation et retrait du LaunchAgent annuel. |
-| `schedule_once.py` | Programmation ponctuelle et retrait automatique de son agent. |
-| `background_check.py` | Sonde de permission exécutée par `launchd`, sans lire les conversations. |
-| `test_send.py` | Vérification d’un groupe et envoi de test explicite. |
-| `permissions.py` | Demande et affiche le statut d’autorisation Accessibilité. |
-| `inspect_whatsapp.py` | Inspection des sélecteurs; masque le contenu des bulles par défaut. |
-| `inspect-whatsapp.py` | Ancien inspecteur brut, conservé pour référence; sa sortie peut inclure des messages privés. |
-| `.env.example` | Modèle des réglages communs avec valeurs fictives. |
-| `birthdays.json.example` | Modèle des personnes avec anniversaires fictifs. |
-| `requirements.txt` | Dépendances macOS épinglées. |
-| `tests/` | Tests du calendrier, de l’état, des exemples, de l’adaptateur et des planificateurs. |
-| `.github/workflows/tests.yml` | CI macOS et Python 3.12, sans envoi WhatsApp. |
-| `.gitignore` | Exclusion des données privées et des fichiers générés. |
-| `LICENSE` | Licence MIT. |
-| `README.md` | Installation, utilisation, architecture et diagnostic. |
+| `main.py` | Main CLI: preview, send, diagnostics, history, and pending-result resolution. |
+| `birthday_bot.py` | Validation, due-birthday calculation, locking, and durable state. |
+| `settings.py` | Reads and validates `.env` settings. |
+| `whatsapp_ax.py` | Finds the group, pastes, sends, and confirms through Accessibility. |
+| `scheduler.py` | Generates, installs, and removes the recurring birthday LaunchAgent. |
+| `schedule_once.py` | Schedules a one-off message and automatically removes its agent. |
+| `background_check.py` | Permission probe run by `launchd` without reading conversations. |
+| `test_send.py` | Checks a group and sends an explicitly requested test message. |
+| `permissions.py` | Requests and displays Accessibility permission status. |
+| `inspect_whatsapp.py` | Inspects selectors; hides message-bubble content by default. |
+| `inspect-whatsapp.py` | Legacy raw inspector, kept for reference; its output may include private messages. |
+| `.env.example` | Shared-settings template with fictional values. |
+| `birthdays.json.example` | People template with fictional birthdays. |
+| `requirements.txt` | Pinned macOS dependencies. |
+| `tests/` | Calendar, state, example, adapter, and scheduling tests. |
+| `.github/workflows/tests.yml` | macOS and Python 3.12 CI without WhatsApp sends. |
+| `.gitignore` | Excludes private data and generated files. |
+| `LICENSE` | MIT license. |
+| `README.md` | Installation, usage, architecture, and troubleshooting guide. |
 
-## Diagnostic, journaux et tests
+## Diagnostics, logs, and tests
 
 ```sh
 python main.py --doctor
@@ -258,16 +258,16 @@ python inspect_whatsapp.py
 python -m unittest discover -s tests -v
 ```
 
-Les tests automatisés utilisent des arbres d’accessibilité fictifs et des processus simulés; ils ne publient aucun message et ne requièrent pas de session WhatsApp. La CI les exécute sur macOS avec Python 3.12.
+Automated tests use fake Accessibility trees and mocked processes. They do not send messages or require a WhatsApp session. CI runs them on macOS with Python 3.12.
 
-`inspect_whatsapp.py --include-messages` inclut les textes privés dans la sortie. Ne pas publier ces diagnostics. Les sélecteurs observés sont notamment `TokenizedSearchBar_TextView`, `ChatListSearchView_ChatResult`, `NavigationBar_HeaderViewButton`, `ChatBar_ComposerTextView` et `WAMessageBubbleTableViewCell`.
+`inspect_whatsapp.py --include-messages` includes private message text in its output. Do not publish those diagnostics. Observed selectors include `TokenizedSearchBar_TextView`, `ChatListSearchView_ChatResult`, `NavigationBar_HeaderViewButton`, `ChatBar_ComposerTextView`, and `WAMessageBubbleTableViewCell`.
 
-Les journaux sont dans `logs/bot.log`, `logs/scheduler.log`, `logs/scheduler-error.log`, `logs/one-off.log` et `logs/one-off-error.log`. `bot.log` tourne à 1 Mo avec trois sauvegardes; les sorties de `launchd` ne sont pas automatiquement purgées. Les simulations affichent les textes dans le terminal sans les archiver dans `bot.log`.
+Logs are stored in `logs/bot.log`, `logs/scheduler.log`, `logs/scheduler-error.log`, `logs/one-off.log`, and `logs/one-off-error.log`. `bot.log` rotates at 1 MB with three backups; `launchd` output logs are not automatically purged. Previews display message text in the terminal without storing it in `bot.log`.
 
-Les fichiers `.env`, `birthdays.json`, `state.json`, les verrous, les journaux, les arbres d’accessibilité exportés et les `.plist` générés restent locaux et sont ignorés par Git. Les exemples sont publiés et doivent être copiés à l’installation. Conserver l’historique lors des mises à jour.
+The `.env`, `birthdays.json`, and `state.json` files, locks, logs, exported Accessibility trees, and generated `.plist` files stay local and are ignored by Git. Examples are published and must be copied during installation. Preserve the history when updating the project.
 
-Références : [ApplicationServices dans PyObjC](https://pyobjc.readthedocs.io/en/latest/apinotes/ApplicationServices.html), [agents launchd chez Apple](https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html).
+References: [ApplicationServices in PyObjC](https://pyobjc.readthedocs.io/en/latest/apinotes/ApplicationServices.html), [Apple's launchd agents guide](https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html).
 
-## Licence
+## License
 
 [MIT](LICENSE), copyright 2026 Wolfidy7.
