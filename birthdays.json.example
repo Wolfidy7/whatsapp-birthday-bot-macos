@@ -1,0 +1,6 @@
+{
+  "birthdays": [
+    {"id": "camille-example", "name": "Camille", "month": 5, "day": 14},
+    {"id": "robin-example", "name": "Robin", "month": 11, "day": 22}
+  ]
+}

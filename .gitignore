@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+state.json
+state.json.lock
+logs/
+whatsapp-tree*.txt
+birthdays.local.json
+.env
+.env.*
+!.env.example
+birthdays.json
+birthday.json
+*.lock
+.DS_Store
+com.whatsapp-birthday-bot*.plist
